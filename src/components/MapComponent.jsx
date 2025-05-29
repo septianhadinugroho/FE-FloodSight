@@ -11,10 +11,10 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
   const map = useRef(null);
   const marker = useRef(null);
 
-  // Jabodetabek bounds
+  // Jabodetabek bounds (updated)
   const jabodetabekBounds = [
-    [106.4, -6.6], // Southwest
-    [107.2, -5.8]  // Northeast
+    [106.3, -6.8], // Southwest
+    [107.2, -5.7]  // Northeast
   ];
 
   useEffect(() => {
@@ -36,53 +36,6 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
       console.log('Map loaded successfully');
 
       try {
-        map.current.addSource('flood-data', {
-          type: 'geojson',
-          data: '/geojson/banjir_jabodetabek_fix.geojson',
-          cluster: false
-        });
-
-        map.current.addLayer({
-          id: 'flood-lines',
-          type: 'line',
-          source: 'flood-data',
-          filter: ['==', '$type', 'LineString'],
-          paint: {
-            'line-color': [
-              'match',
-              ['get', 'risk_level'],
-              'critical', '#FF0000',
-              'very_high', '#FF4500',
-              'high', '#FF8C00',
-              'medium', '#FFA500',
-              '#FFD700'
-            ],
-            'line-width': 4,
-            'line-opacity': 0.8
-          }
-        });
-
-        map.current.addLayer({
-          id: 'flood-points',
-          type: 'circle',
-          source: 'flood-data',
-          filter: ['==', '$type', 'Point'],
-          paint: {
-            'circle-radius': 8,
-            'circle-color': [
-              'match',
-              ['get', 'risk_level'],
-              'critical', '#FF0000',
-              'very_high', '#FF4500',
-              'high', '#FF8C00',
-              'medium', '#FFA500',
-              '#FFD700'
-            ],
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#FFFFFF'
-          }
-        });
-
         marker.current = new maptilersdk.Marker({
           draggable: true,
           color: '#3B82F6'
@@ -92,8 +45,8 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
 
         marker.current.on('dragend', () => {
           const { lng, lat } = marker.current.getLngLat();
-          const boundedLng = Math.max(106.4, Math.min(107.2, lng));
-          const boundedLat = Math.max(-6.6, Math.min(-5.8, lat));
+          const boundedLng = Math.max(106.3, Math.min(107.2, lng));
+          const boundedLat = Math.max(-6.8, Math.min(-5.7, lat));
           console.log('Marker dragged to:', [boundedLng, boundedLat]);
           setPosition([boundedLng, boundedLat]);
           map.current.flyTo({
@@ -104,52 +57,19 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
 
         // Add map click event to move marker
         map.current.on('click', (e) => {
-          // Only move marker if not clicking on a flood feature
-          if (!e.features || e.features.length === 0) {
-            const { lng, lat } = e.lngLat;
-            const boundedLng = Math.max(106.4, Math.min(107.2, lng));
-            const boundedLat = Math.max(-6.6, Math.min(-5.8, lat));
-            console.log('Map clicked at:', [boundedLng, boundedLat]);
-            marker.current.setLngLat([boundedLng, boundedLat]);
-            setPosition([boundedLng, boundedLat]);
-            map.current.flyTo({
-              center: [boundedLng, boundedLat],
-              essential: true
-            });
-          }
+          const { lng, lat } = e.lngLat;
+          const boundedLng = Math.max(106.3, Math.min(107.2, lng));
+          const boundedLat = Math.max(-6.8, Math.min(-5.7, lat));
+          console.log('Map clicked at:', [boundedLng, boundedLat]);
+          marker.current.setLngLat([boundedLng, boundedLat]);
+          setPosition([boundedLng, boundedLat]);
+          map.current.flyTo({
+            center: [boundedLng, boundedLat],
+            essential: true
+          });
         });
-
-        const createPopup = (e) => {
-          const feature = e.features[0];
-          if (!feature.properties) return;
-
-          new maptilersdk.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML(`
-              <div class="p-2">
-                <h3 class="font-bold">${feature.properties.name || 'Unnamed Location'}</h3>
-                <p>${feature.properties.popupContent || ''}</p>
-                <p class="mt-1 text-sm">Risk Level: 
-                  <span class="font-semibold">${feature.properties.risk_level || 'unknown'}</span>
-                </p>
-              </div>
-            `)
-            .addTo(map.current);
-        };
-
-        map.current.on('click', 'flood-points', createPopup);
-        map.current.on('click', 'flood-lines', createPopup);
-
-        map.current.on('mouseenter', ['flood-points', 'flood-lines'], () => {
-          map.current.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.current.on('mouseleave', ['flood-points', 'flood-lines'], () => {
-          map.current.getCanvas().style.cursor = '';
-        });
-
       } catch (error) {
-        console.error('Error loading map layers:', error);
+        console.error('Error setting up map:', error);
       }
     });
 
@@ -163,8 +83,8 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
 
   useEffect(() => {
     if (map.current && marker.current && position) {
-      const boundedLng = Math.max(106.4, Math.min(107.2, position[0]));
-      const boundedLat = Math.max(-6.6, Math.min(-5.8, position[1]));
+      const boundedLng = Math.max(106.3, Math.min(107.2, position[0]));
+      const boundedLat = Math.max(-6.8, Math.min(-5.7, position[1]));
       marker.current.setLngLat([boundedLng, boundedLat]);
       map.current.flyTo({
         center: [boundedLng, boundedLat],

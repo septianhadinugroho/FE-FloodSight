@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Logo from '../assets/LogoFloodSight-Remove.png';
 
 export default function Footer() {
   return (
@@ -9,7 +10,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <img
-                src="/src/assets/LogoFloodSight-Remove.png"
+                src={Logo}
                 alt="FloodSight Logo"
                 className="h-6 w-6 object-contain"
                 style={{ filter: 'brightness(0) invert(1)' }} // White logo

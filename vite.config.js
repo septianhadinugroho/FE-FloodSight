@@ -21,5 +21,8 @@ export default defineConfig({
       "Cross-Origin-Embedder-Policy": "unsafe-none",
       "Cross-Origin-Opener-Policy": "unsafe-none"
     }
+  },
+  build: {
+    assetsInlineLimit: 0,
   }
 })

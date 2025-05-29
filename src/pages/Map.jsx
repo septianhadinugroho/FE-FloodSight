@@ -1,26 +1,44 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MapComponent from '../components/MapComponent';
 import PredictionForm from '../components/PredictionForm';
 import { Formik } from 'formik';
+import api from '../api/axios';
 
 export default function MapPage() {
   const [position, setPosition] = useState([106.8272, -6.1751]);
   const [predictionResult, setPredictionResult] = useState(null);
+  const navigate = useNavigate();
 
   const handlePredictionSubmit = async (values, { setSubmitting }) => {
     try {
       console.log('Submitting prediction:', values);
 
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await api.post('/api/predict', {
+        tahun: values.tahun,
+        bulan: values.bulan,
+        latitude: parseFloat(values.latitude),
+        longitude: parseFloat(values.longitude),
+      });
 
-      const riskLevel = Math.random() > 0.7 ? 'High' : Math.random() > 0.4 ? 'Medium' : 'Low';
+      const { prediksi_label, kecamatan, kabupaten } = response.data;
+
       setPredictionResult({
-        riskLevel,
-        message: `Flood risk for ${values.bulan}/${values.tahun} is ${riskLevel}`,
-        details: values
+        prediksi_label,
+        message: `Prediksi banjir untuk ${values.bulan}/${values.tahun} di ${kecamatan}, ${kabupaten} adalah ${prediksi_label ? 'Banjir' : 'Tidak Banjir'}`,
+        details: { ...values, kecamatan, kabupaten },
       });
     } catch (error) {
       console.error('Prediction error:', error);
+      const errorMessage = error.response?.data?.error || 'Gagal melakukan prediksi. Silakan coba lagi.';
+      setPredictionResult({
+        message: errorMessage,
+        error: true,
+      });
+      // Only redirect to login if explicitly a 401 error
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -35,8 +53,8 @@ export default function MapPage() {
           tahun: new Date().getFullYear(),
           bulan: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][new Date().getMonth()],
-          latitude: position[1],
-          longitude: position[0]
+          latitude: parseFloat(position[1]).toFixed(6),
+          longitude: parseFloat(position[0]).toFixed(6),
         }}
         onSubmit={handlePredictionSubmit}
       >
@@ -69,12 +87,11 @@ export default function MapPage() {
               {predictionResult && (
                 <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
                   <h3 className="text-lg font-semibold mb-2">Hasil Prediksi</h3>
-                  <div className={`p-3 rounded-md ${predictionResult.riskLevel === 'High' ? 'bg-red-100 text-red-800' :
-                    predictionResult.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
+                  <div className={`p-3 rounded-md ${predictionResult.error ? 'bg-red-100 text-red-800' : predictionResult.prediksi_label ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
                     <p className="font-bold">{predictionResult.message}</p>
-                    <p className="mt-2 text-sm">Lokasi: {predictionResult.details.latitude}, {predictionResult.details.longitude}</p>
+                    {!predictionResult.error && (
+                      <p className="mt-2 text-sm">Lokasi: {predictionResult.details.kecamatan}, {predictionResult.details.kabupaten} ({predictionResult.details.latitude}, {predictionResult.details.longitude})</p>
+                    )}
                   </div>
                 </div>
               )}

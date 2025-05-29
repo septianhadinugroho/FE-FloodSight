@@ -3,16 +3,16 @@ import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 
 const registerSchema = Yup.object().shape({
-  name: Yup.string().required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
-  password: Yup.string().min(6, 'Too short').required('Required'),
+  name: Yup.string().required('Wajib diisi'),
+  email: Yup.string().email('Email tidak valid').required('Wajib diisi'),
+  password: Yup.string().min(6, 'Terlalu pendek').required('Wajib diisi'),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password'), null], 'Passwords must match')
-    .required('Required'),
-  city: Yup.string().required('Required'),
-  // Hapus validasi untuk longitude dan latitude karena akan diisi otomatis
+    .oneOf([Yup.ref('password'), null], 'Password harus sama')
+    .required('Wajib diisi'),
+  city: Yup.string().required('Wajib diisi'),
 });
 
 export default function Register() {
@@ -20,26 +20,36 @@ export default function Register() {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [coordinates, setCoordinates] = useState({
     latitude: 0,
-    longitude: 0
+    longitude: 0,
   });
+  const [apiError, setApiError] = useState(null);
   const { register } = useAuth();
 
-  const handleSubmit = (values, { setSubmitting }) => {
-    const userData = {
-      name: values.name,
-      email: values.email,
-      city: values.city,
-      latitude: coordinates.latitude,
-      longitude: coordinates.longitude,
-    };
+  const handleSubmit = async (values, { setSubmitting }) => {
+    if (coordinates.latitude === 0 || coordinates.longitude === 0) {
+      setApiError('Harap masukkan lokasi Anda');
+      setSubmitting(false);
+      return;
+    }
 
-    // Simpan data user ke localStorage
-    localStorage.setItem('profileData', JSON.stringify(userData));
-
-    // Simulasikan login langsung setelah register
-    register(userData);
-
-    setSubmitting(false);
+    try {
+      const response = await api.post('/register', {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        city: values.city,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+      });
+      const { user, token } = response.data;
+      localStorage.setItem('profileData', JSON.stringify(user));
+      register(user, token);
+      setApiError(null);
+    } catch (err) {
+      setApiError(err.response?.data?.error || 'Registrasi gagal');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const getCurrentLocation = (setFieldValue) => {
@@ -47,7 +57,7 @@ export default function Register() {
     setLocationError(null);
 
     if (!navigator.geolocation) {
-      setLocationError('Geolocation is not supported by your browser');
+      setLocationError('Geolokasi tidak didukung oleh browser Anda');
       setIsGettingLocation(false);
       return;
     }
@@ -56,22 +66,21 @@ export default function Register() {
       (position) => {
         const newCoords = {
           latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          longitude: position.coords.longitude,
         };
         setCoordinates(newCoords);
-        // Set nilai ke Formik tanpa menampilkan field
         setFieldValue('latitude', newCoords.latitude);
         setFieldValue('longitude', newCoords.longitude);
         setIsGettingLocation(false);
       },
       (error) => {
-        setLocationError('Unable to retrieve your location: ' + error.message);
+        setLocationError('Gagal mendapatkan lokasi: ' + error.message);
         setIsGettingLocation(false);
       },
       {
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: 0
+        maximumAge: 0,
       }
     );
   };
@@ -79,6 +88,7 @@ export default function Register() {
   return (
     <div className="max-w-md mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
+      {apiError && <div className="text-red-500 text-sm mb-4">{apiError}</div>}
       <Formik
         initialValues={{
           name: '',
@@ -92,7 +102,6 @@ export default function Register() {
       >
         {({ isSubmitting, setFieldValue }) => (
           <Form className="space-y-4 sm:space-y-6">
-            {/* Nama */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
               <Field
@@ -103,7 +112,6 @@ export default function Register() {
               <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
             </div>
 
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
               <Field
@@ -114,7 +122,6 @@ export default function Register() {
               <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
               <Field
@@ -125,9 +132,8 @@ export default function Register() {
               <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
             </div>
 
-            {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
               <Field
                 type="password"
                 name="confirmPassword"
@@ -136,7 +142,6 @@ export default function Register() {
               <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm" />
             </div>
 
-            {/* City */}
             <div>
               <label htmlFor="city" className="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
               <Field
@@ -144,7 +149,7 @@ export default function Register() {
                 name="city"
                 className="mt-1 block w-full rounded-md border-gray-300 p-2 border bg-white"
               >
-                <option value="">Select a city or regency</option>
+                <option value="">Pilih kota atau kabupaten</option>
                 <option value="Jakarta Pusat">Jakarta Pusat</option>
                 <option value="Jakarta Utara">Jakarta Utara</option>
                 <option value="Jakarta Barat">Jakarta Barat</option>
@@ -163,8 +168,6 @@ export default function Register() {
               <ErrorMessage name="city" component="div" className="text-red-500 text-sm" />
             </div>
 
-
-            {/* Lokasi */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Lokasi Saat Ini</label>
               <div className="flex justify-between items-center mb-2">
@@ -176,24 +179,23 @@ export default function Register() {
                 >
                   {isGettingLocation ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Getting Location...
+                      Mendapatkan Lokasi...
                     </>
                   ) : (
                     <>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                       </svg>
-                      Use My Location
+                      Gunakan Lokasi Saya
                     </>
                   )}
                 </button>
               </div>
 
-              {/* Tampilkan latitude & longitude sebagai input non-editable */}
               {(coordinates.latitude !== 0 && coordinates.longitude !== 0) && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
                   <div>
@@ -221,18 +223,16 @@ export default function Register() {
                 <div className="text-red-500 text-sm text-left mt-1">{locationError}</div>
               )}
 
-              {/* Field tersembunyi untuk dikirim ke backend */}
               <Field type="hidden" name="latitude" />
               <Field type="hidden" name="longitude" />
             </div>
-
 
             <button
               type="submit"
               disabled={isGettingLocation || isSubmitting}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
             >
-              {isSubmitting ? 'Registering...' : 'Register'}
+              {isSubmitting ? 'Mendaftar...' : 'Register'}
             </button>
           </Form>
         )}

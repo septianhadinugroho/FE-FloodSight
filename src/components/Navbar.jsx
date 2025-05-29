@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../assets/LogoFloodSight-Remove.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-2">
           <Link to="/" className="flex items-center">
             <img
-              src="/src/assets/LogoFloodSight-Remove.png"
+              src={Logo}
               alt="FloodSight Logo"
               className="h-8 w-8 object-contain transition-transform duration-300 hover:scale-105"
               style={{ filter: 'brightness(0) invert(1)' }} // White logo
