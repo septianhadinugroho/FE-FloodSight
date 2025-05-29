@@ -11,6 +11,12 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
   const map = useRef(null);
   const marker = useRef(null);
 
+  // Jabodetabek bounds
+  const jabodetabekBounds = [
+    [106.4, -6.6], // Southwest
+    [107.2, -5.8]  // Northeast
+  ];
+
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
@@ -18,7 +24,8 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
       container: mapContainer.current,
       style: maptilersdk.MapStyle.STREETS.V2,
       center: position,
-      zoom: 12
+      zoom: 12,
+      maxBounds: jabodetabekBounds // Restrict map to Jabodetabek
     });
 
     map.current.on('error', (error) => {
@@ -85,11 +92,31 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
 
         marker.current.on('dragend', () => {
           const { lng, lat } = marker.current.getLngLat();
-          setPosition([lng, lat]);
+          const boundedLng = Math.max(106.4, Math.min(107.2, lng));
+          const boundedLat = Math.max(-6.6, Math.min(-5.8, lat));
+          console.log('Marker dragged to:', [boundedLng, boundedLat]);
+          setPosition([boundedLng, boundedLat]);
           map.current.flyTo({
-            center: [lng, lat],
+            center: [boundedLng, boundedLat],
             essential: true
           });
+        });
+
+        // Add map click event to move marker
+        map.current.on('click', (e) => {
+          // Only move marker if not clicking on a flood feature
+          if (!e.features || e.features.length === 0) {
+            const { lng, lat } = e.lngLat;
+            const boundedLng = Math.max(106.4, Math.min(107.2, lng));
+            const boundedLat = Math.max(-6.6, Math.min(-5.8, lat));
+            console.log('Map clicked at:', [boundedLng, boundedLat]);
+            marker.current.setLngLat([boundedLng, boundedLat]);
+            setPosition([boundedLng, boundedLat]);
+            map.current.flyTo({
+              center: [boundedLng, boundedLat],
+              essential: true
+            });
+          }
         });
 
         const createPopup = (e) => {
@@ -136,9 +163,11 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
 
   useEffect(() => {
     if (map.current && marker.current && position) {
-      marker.current.setLngLat(position);
+      const boundedLng = Math.max(106.4, Math.min(107.2, position[0]));
+      const boundedLat = Math.max(-6.6, Math.min(-5.8, position[1]));
+      marker.current.setLngLat([boundedLng, boundedLat]);
       map.current.flyTo({
-        center: position,
+        center: [boundedLng, boundedLat],
         essential: true
       });
     }

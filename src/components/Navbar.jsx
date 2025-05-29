@@ -13,86 +13,121 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-lg px-3 sm:px-4 py-3">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex justify-between items-center">
-          <Link to="/" className="text-xl font-bold">FloodSight</Link>
-
-          {/* Hamburger */}
-          <button 
-            className="md:hidden focus:outline-none"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-4">
-            <Link to="/" className="hover:bg-blue-700 px-3 py-2 rounded">Dashboard</Link>
-            <Link to="/map" className="hover:bg-blue-700 px-3 py-2 rounded">Map</Link>
-            <Link to="/profile" className="hover:bg-blue-700 px-3 py-2 rounded">Profile</Link>
-            {user ? (
-              <button
-                onClick={handleLogout}
-                className="hover:bg-blue-700 px-3 py-2 rounded"
-              >
-                Logout
-              </button>
-            ) : (
-              <Link to="/login" className="hover:bg-blue-700 px-3 py-2 rounded">Login</Link>
-            )}
-          </div>
+    <nav className="bg-blue-600 text-white shadow-lg px-4 sm:px-6 py-3">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo and Brand */}
+        <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center">
+            <img
+              src="/src/assets/LogoFloodSight-Remove.png"
+              alt="FloodSight Logo"
+              className="h-8 w-8 object-contain transition-transform duration-300 hover:scale-105"
+              style={{ filter: 'brightness(0) invert(1)' }} // White logo
+            />
+            <span className="text-xl font-semibold tracking-tight">FloodSight</span>
+          </Link>
         </div>
 
-        {/* Mobile Navigation - Side Menu */}
-        <div className={`fixed inset-0 z-50 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out md:hidden`}>
-          <div 
-            className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => setIsOpen(false)}
-          ></div>
+        {/* Hamburger */}
+        <button
+          className="md:hidden focus:outline-none"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            {isOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
 
-          {/* Side Menu Content */}
-          <div className="absolute right-0 top-0 h-full w-64 bg-blue-600 shadow-xl">
-            <div className="flex flex-col h-full p-4">
-              <button 
-                className="self-end mb-4 focus:outline-none"
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-6">
+          <Link to="/" className="text-base font-medium hover:bg-blue-700 px-3 py-2 rounded-md transition-colors duration-200">
+            Dashboard
+          </Link>
+          <Link to="/map" className="text-base font-medium hover:bg-blue-700 px-3 py-2 rounded-md transition-colors duration-200">
+            Map
+          </Link>
+          <Link to="/profile" className="text-base font-medium hover:bg-blue-700 px-3 py-2 rounded-md transition-colors duration-200">
+            Profile
+          </Link>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="text-base font-medium hover:bg-blue-700 px-3 py-2 rounded-md transition-colors duration-200"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/login" className="text-base font-medium hover:bg-blue-700 px-3 py-2 rounded-md transition-colors duration-200">
+              Login
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Navigation - Side Menu */}
+      <div className={`fixed inset-0 z-50 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out md:hidden`}>
+        <div
+          className="absolute inset-0 bg-black bg-opacity-50"
+          onClick={() => setIsOpen(false)}
+        ></div>
+
+        {/* Side Menu Content */}
+        <div className="absolute right-0 top-0 h-full w-64 bg-blue-600 shadow-xl">
+          <div className="flex flex-col h-full p-6">
+            <button
+              className="self-end mb-6 focus:outline-none"
+              onClick={() => setIsOpen(false)}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="flex flex-col space-y-4">
+              <Link
+                to="/"
+                className="text-base font-medium hover:bg-blue-700 px-4 py-2 rounded-md transition-colors duration-200"
                 onClick={() => setIsOpen(false)}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-
-              <div className="flex flex-col space-y-4">
-                <Link to="/" className="hover:bg-blue-700 px-3 py-2 rounded" onClick={() => setIsOpen(false)}>Dashboard</Link>
-                <Link to="/map" className="hover:bg-blue-700 px-3 py-2 rounded" onClick={() => setIsOpen(false)}>Map</Link>
-                <Link to="/profile" className="hover:bg-blue-700 px-3 py-2 rounded" onClick={() => setIsOpen(false)}>Profile</Link>
-                {user ? (
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsOpen(false);
-                    }}
-                    className="text-left hover:bg-blue-700 px-3 py-2 rounded"
-                  >
-                    Logout
-                  </button>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="hover:bg-blue-700 px-3 py-2 rounded"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Login
-                  </Link>
-                )}
-              </div>
+                Dashboard
+              </Link>
+              <Link
+                to="/map"
+                className="text-base font-medium hover:bg-blue-700 px-4 py-2 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
+              >
+                Map
+              </Link>
+              <Link
+                to="/profile"
+                className="text-base font-medium hover:bg-blue-700 px-4 py-2 rounded-md transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
+              >
+                Profile
+              </Link>
+              {user ? (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsOpen(false);
+                  }}
+                  className="text-left text-base font-medium hover:bg-blue-700 px-4 py-2 rounded-md transition-colors duration-200"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-base font-medium hover:bg-blue-700 px-4 py-2 rounded-md transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>
