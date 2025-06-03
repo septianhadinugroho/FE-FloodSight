@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import jakartaHero from '../assets/banjir.png';
 import { jabodetabekAreas } from '../data/jabodetabekAreas';
-import Footer from '../components/Footer';
 import { useWeather } from '../context/WeatherContext';
 
 export default function Dashboard() {

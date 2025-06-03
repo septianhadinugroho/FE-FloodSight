@@ -1,9 +1,10 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import toast from 'react-hot-toast'; // Import toast
 
 const registerSchema = Yup.object().shape({
   name: Yup.string().required('Wajib diisi'),
@@ -24,6 +25,7 @@ export default function Register() {
   });
   const [apiError, setApiError] = useState(null);
   const { register } = useAuth();
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleSubmit = async (values, { setSubmitting }) => {
     if (coordinates.latitude === 0 || coordinates.longitude === 0) {
@@ -45,8 +47,13 @@ export default function Register() {
       localStorage.setItem('profileData', JSON.stringify(user));
       register(user, token);
       setApiError(null);
+      // Show success toast and redirect
+      toast.success('Registrasi berhasil! Selamat datang!', {
+        onClose: () => navigate('/'), // Redirect to dashboard
+      });
     } catch (err) {
       setApiError(err.response?.data?.error || 'Registrasi gagal');
+      toast.error(err.response?.data?.error || 'Registrasi gagal');
     } finally {
       setSubmitting(false);
     }
@@ -96,6 +103,8 @@ export default function Register() {
           password: '',
           confirmPassword: '',
           city: '',
+          latitude: 0, // Initialize to prevent uncontrolled input
+          longitude: 0, // Initialize to prevent uncontrolled input
         }}
         validationSchema={registerSchema}
         onSubmit={handleSubmit}
@@ -179,16 +188,34 @@ export default function Register() {
                 >
                   {isGettingLocation ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 24 24">
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-5 w-5 text-gray-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1theros 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Mendapatkan Lokasi...
                     </>
                   ) : (
                     <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-1"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       Gunakan Lokasi Saya
                     </>
@@ -223,8 +250,8 @@ export default function Register() {
                 <div className="text-red-500 text-sm text-left mt-1">{locationError}</div>
               )}
 
-              <Field type="hidden" name="latitude" />
-              <Field type="hidden" name="longitude" />
+              <Field type="hidden" name="latitude" value={coordinates.latitude} />
+              <Field type="hidden" name="longitude" value={coordinates.longitude} />
             </div>
 
             <button

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/LogoFloodSight-Remove.png';
+import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,8 +10,20 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    navigate('/');
+    try {
+      // Clear local storage and call logout
+      localStorage.removeItem('token');
+      localStorage.removeItem('profileData');
+      logout(); // Clear user state in AuthContext
+      toast.success('Berhasil logout!', {
+        duration: 3000,
+      });
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Gagal logout. Silakan coba lagi.');
+    }
+    setIsOpen(false);
   };
 
   return (
@@ -23,7 +36,7 @@ export default function Navbar() {
               src={Logo}
               alt="FloodSight Logo"
               className="h-8 w-8 object-contain transition-transform duration-300 hover:scale-105"
-              style={{ filter: 'brightness(0) invert(1)' }} // White logo
+              style={{ filter: 'brightness(0) invert(1)' }}
             />
             <span className="text-xl font-semibold tracking-tight">FloodSight</span>
           </Link>
@@ -76,7 +89,6 @@ export default function Navbar() {
           onClick={() => setIsOpen(false)}
         ></div>
 
-        {/* Side Menu Content */}
         <div className="absolute right-0 top-0 h-full w-64 bg-blue-600 shadow-xl">
           <div className="flex flex-col h-full p-6">
             <button
@@ -84,7 +96,7 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path strokeLinecap="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
@@ -112,10 +124,7 @@ export default function Navbar() {
               </Link>
               {user ? (
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
+                  onClick={handleLogout}
                   className="text-left text-base font-medium hover:bg-blue-700 px-4 py-2 rounded-md transition-colors duration-200"
                 >
                   Logout

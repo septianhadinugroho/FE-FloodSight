@@ -24,7 +24,6 @@ export function AuthProvider({ children }) {
             console.log('Token expired');
             localStorage.removeItem('profileData');
             localStorage.removeItem('token');
-机关
             setUser(null);
             setLoading(false);
             navigate('/login');

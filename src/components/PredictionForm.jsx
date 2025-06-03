@@ -19,7 +19,7 @@ const predictionSchema = Yup.object().shape({
   latitude: Yup.number()
     .required('Latitude harus diisi')
     .min(-6.8, 'Latitude harus antara -6.8 dan -5.7 (wilayah Jabodetabek)')
-    .max(-5.7, 'Latitude harus antara -6.8 dan -5.7 (wilayah Jabodetabek)'),
+    .max(-5.9, 'Latitude harus antara -6.8 dan -5.7 (wilayah Jabodetabek)'),
   longitude: Yup.number()
     .required('Longitude harus diisi')
     .min(106.3, 'Longitude harus antara 106.3 dan 107.2 (wilayah Jabodetabek)')

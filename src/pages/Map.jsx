@@ -21,12 +21,12 @@ export default function MapPage() {
         longitude: parseFloat(values.longitude),
       });
 
-      const { prediksi_label, kecamatan, kabupaten } = response.data;
+      const { prediksi_label } = response.data;
 
       setPredictionResult({
         prediksi_label,
-        message: `Prediksi banjir untuk ${values.bulan}/${values.tahun} di ${kecamatan}, ${kabupaten} adalah ${prediksi_label ? 'Banjir' : 'Tidak Banjir'}`,
-        details: { ...values, kecamatan, kabupaten },
+        message: `Prediksi banjir untuk wilayah (${parseFloat(values.latitude).toFixed(6)}, ${parseFloat(values.longitude).toFixed(6)}) pada ${values.bulan} ${values.tahun} adalah ${prediksi_label ? 'Banjir' : 'Tidak Banjir'}`,
+        details: { ...values },
       });
     } catch (error) {
       console.error('Prediction error:', error);
@@ -35,7 +35,6 @@ export default function MapPage() {
         message: errorMessage,
         error: true,
       });
-      // Only redirect to login if explicitly a 401 error
       if (error.response?.status === 401) {
         navigate('/login');
       }
@@ -89,9 +88,6 @@ export default function MapPage() {
                   <h3 className="text-lg font-semibold mb-2">Hasil Prediksi</h3>
                   <div className={`p-3 rounded-md ${predictionResult.error ? 'bg-red-100 text-red-800' : predictionResult.prediksi_label ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
                     <p className="font-bold">{predictionResult.message}</p>
-                    {!predictionResult.error && (
-                      <p className="mt-2 text-sm">Lokasi: {predictionResult.details.kecamatan}, {predictionResult.details.kabupaten} ({predictionResult.details.latitude}, {predictionResult.details.longitude})</p>
-                    )}
                   </div>
                 </div>
               )}

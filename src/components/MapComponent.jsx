@@ -14,7 +14,7 @@ export default function MapComponent({ position = [106.8272, -6.1751], setPositi
   // Jabodetabek bounds (updated)
   const jabodetabekBounds = [
     [106.3, -6.8], // Southwest
-    [107.2, -5.7]  // Northeast
+    [107.2, -5.9]  // Northeast
   ];
 
   useEffect(() => {
