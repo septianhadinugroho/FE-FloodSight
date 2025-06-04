@@ -11,8 +11,8 @@ const bulanOptions = [
 const predictionSchema = Yup.object().shape({
   tahun: Yup.number()
     .required('Tahun harus diisi')
-    .min(2020, 'Tahun minimal 2020')
-    .max(2030, 'Tahun maksimal 2030'),
+    .min(2025, 'Tahun minimal 2025')
+    .max(2027, 'Tahun maksimal 2027'),
   bulan: Yup.string()
     .required('Bulan harus dipilih')
     .oneOf(bulanOptions, 'Bulan tidak valid'),
