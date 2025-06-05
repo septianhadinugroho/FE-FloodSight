@@ -117,7 +117,7 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6">Profil</h1>
+      <h1 className="text-2xl font-bold mb-6">Profile</h1>
       {apiError && <div className="text-red-500 text-sm mb-4">{apiError}</div>}
 
       <div className="space-y-4">

@@ -67,7 +67,60 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-      {loading ? <div>Loading...</div> : children}
+      {loading ? (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            backgroundColor: '#f0f2f5',
+          }}
+        >
+          <svg
+            width="100"
+            height="100"
+            viewBox="0 0 50 50"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ animation: 'spin 1s linear infinite' }}
+          >
+            <circle
+              cx="25"
+              cy="25"
+              r="20"
+              stroke="#007bff"
+              strokeWidth="4"
+              fill="none"
+              strokeDasharray="31.4"
+              strokeDashoffset="0"
+            >
+              <animate
+                attributeName="strokeDashoffset"
+                values="0;31.4"
+                dur="1.5s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="1;0.3"
+                dur="1.5s"
+                repeatCount="indefinite"
+              />
+            </circle>
+          </svg>
+          <style>
+            {`
+              @keyframes spin {
+                100% {
+                  transform: rotate(360deg);
+                }
+              }
+            `}
+          </style>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }

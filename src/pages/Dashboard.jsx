@@ -51,9 +51,9 @@ export default function Dashboard() {
         <img
           src={jakartaHero}
           alt="Banjir Jabodetabek"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-2xl"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 to-blue-600/30 flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 to-blue-600/30 flex items-center justify-center rounded-2xl">
           <div className="text-center px-4">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
               FloodSight
