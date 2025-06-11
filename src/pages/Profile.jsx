@@ -156,28 +156,14 @@ export default function Profile() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
           {isEditing ? (
-            <select
+            <input
+              type="text"
               name="city"
               value={userData.city || ''}
               onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 p-2 border bg-white"
-            >
-              <option value="">Pilih kota atau kabupaten</option>
-              <option value="Jakarta Pusat">Jakarta Pusat</option>
-              <option value="Jakarta Utara">Jakarta Utara</option>
-              <option value="Jakarta Barat">Jakarta Barat</option>
-              <option value="Jakarta Timur">Jakarta Timur</option>
-              <option value="Jakarta Selatan">Jakarta Selatan</option>
-              <option value="Kepulauan Seribu">Kepulauan Seribu</option>
-              <option value="Kota Depok">Kota Depok</option>
-              <option value="Kota Bekasi">Kota Bekasi</option>
-              <option value="Kabupaten Bekasi">Kabupaten Bekasi</option>
-              <option value="Kota Bogor">Kota Bogor</option>
-              <option value="Kabupaten Bogor">Kabupaten Bogor</option>
-              <option value="Kota Tangerang">Kota Tangerang</option>
-              <option value="Kota Tangerang Selatan">Kota Tangerang Selatan</option>
-              <option value="Kabupaten Tangerang">Kabupaten Tangerang</option>
-            </select>
+              placeholder="Masukkan nama kota atau kabupaten"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+            />
           ) : (
             <p className="mt-1 p-2 bg-gray-50 rounded">{userData.city || <span className="text-gray-400">Belum diisi</span>}</p>
           )}

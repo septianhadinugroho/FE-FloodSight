@@ -21,12 +21,16 @@ export default function MapPage() {
         longitude: parseFloat(values.longitude),
       });
 
-      const { prediksi_label } = response.data;
+      const { prediksi_label, metadata } = response.data;
 
       setPredictionResult({
         prediksi_label,
-        message: `Prediksi banjir untuk wilayah (${parseFloat(values.latitude).toFixed(6)}, ${parseFloat(values.longitude).toFixed(6)}) pada ${values.bulan} ${values.tahun} adalah ${prediksi_label ? 'Banjir' : 'Tidak Banjir'}`,
-        details: { ...values },
+        message: `Prediksi banjir untuk wilayah ${metadata.district.NAME_3}, ${metadata.district.NAME_2} (${parseFloat(values.latitude).toFixed(6)}, ${parseFloat(values.longitude).toFixed(6)}) pada ${values.bulan} ${values.tahun} adalah ${prediksi_label ? 'Banjir' : 'Tidak Banjir'}`,
+        details: {
+          ...values,
+          kabupaten: metadata.district.NAME_2,
+          kecamatan: metadata.district.NAME_3,
+        },
       });
     } catch (error) {
       console.error('Prediction error:', error);
@@ -88,6 +92,12 @@ export default function MapPage() {
                   <h3 className="text-lg font-semibold mb-2">Hasil Prediksi</h3>
                   <div className={`p-3 rounded-md ${predictionResult.error ? 'bg-red-100 text-red-800' : predictionResult.prediksi_label ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
                     <p className="font-bold">{predictionResult.message}</p>
+                    {!predictionResult.error && (
+                      <div className="mt-2 text-sm">
+                        <p>Kabupaten/Kota: {predictionResult.details.kabupaten}</p>
+                        <p>Kecamatan: {predictionResult.details.kecamatan}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

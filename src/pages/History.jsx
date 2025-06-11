@@ -97,15 +97,24 @@ export default function History() {
       )}
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="hidden md:grid grid-cols-7 bg-gray-100 p-4 font-medium">
+        <div className="hidden md:grid grid-cols-9 bg-gray-100 p-4 font-medium">
+          <div className="col-span-2">Kabupaten/Kota</div>
+          <div className="col-span-2">Kecamatan</div>
           <div className="col-span-2">Longitude</div>
           <div className="col-span-2">Latitude</div>
-          <div className="col-span-2">Bulan/Tahun</div>
           <div className="col-span-1">Prediksi</div>
         </div>
 
         {predictionHistory.map((item) => (
-          <div key={item._id} className="grid grid-cols-1 md:grid-cols-7 p-4 border-b hover:bg-gray-50 transition-colors gap-2 md:gap-0">
+          <div key={item._id} className="grid grid-cols-1 md:grid-cols-9 p-4 border-b hover:bg-gray-50 transition-colors gap-2 md:gap-0">
+            <div className="md:hidden flex justify-between">
+              <span className="text-gray-500">Kabupaten/Kota:</span>
+              <span>{item.kabupaten || 'N/A'}</span>
+            </div>
+            <div className="md:hidden flex justify-between">
+              <span className="text-gray-500">Kecamatan:</span>
+              <span>{item.kecamatan || 'N/A'}</span>
+            </div>
             <div className="md:hidden flex justify-between">
               <span className="text-gray-500">Longitude:</span>
               <span>{item.longitude.toFixed(6)}</span>
@@ -116,7 +125,7 @@ export default function History() {
             </div>
             <div className="md:hidden flex justify-between">
               <span className="text-gray-500">Bulan/Tahun:</span>
-              <span>{new Date(item.tanggal).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</span>
+              <span>{item.bulan} {item.tahun}</span>
             </div>
             <div className="md:hidden flex justify-between">
               <span className="text-gray-500">Prediksi:</span>
@@ -128,13 +137,16 @@ export default function History() {
             </div>
 
             <div className="hidden md:block col-span-2 text-gray-600">
+              {item.kabupaten || 'N/A'}
+            </div>
+            <div className="hidden md:block col-span-2 text-gray-600">
+              {item.kecamatan || 'N/A'}
+            </div>
+            <div className="hidden md:block col-span-2 text-gray-600">
               {item.longitude.toFixed(6)}
             </div>
             <div className="hidden md:block col-span-2 text-gray-600">
               {item.latitude.toFixed(6)}
-            </div>
-            <div className="hidden md:block col-span-2 text-gray-600">
-              {new Date(item.tanggal).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
             </div>
             <div className="hidden md:block col-span-1">
               <span className={`px-2 py-1 rounded-full text-xs ${
