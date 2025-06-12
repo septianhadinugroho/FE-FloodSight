@@ -48,7 +48,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="/profile" className="hover:text-blue-200 transition-colors">
-                  Profil Saya
+                  Profile
                 </Link>
               </li>
             </ul>

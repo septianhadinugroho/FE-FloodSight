@@ -77,7 +77,7 @@ export default function Dashboard() {
           <div className="bg-white p-3 sm:p-5 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-2">
             <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2 flex items-center text-gray-800">
               <span className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-400 rounded-full mr-2 sm:mr-3"></span>
-              Peringatan Hujan
+              Peringatan Hujan JABODETABEK
             </h3>
             <p className="text-4xl sm:text-5xl font-bold text-yellow-500">{rainWarningsCount}</p>
             <p className="text-gray-500 mt-1 sm:mt-2 text-xs sm:text-sm">Wilayah berisiko hujan (BMKG)</p>
@@ -87,7 +87,7 @@ export default function Dashboard() {
               <span className="w-3 h-3 sm:w-4 sm:h-4 bg-blue-400 rounded-full mr-2 sm:mr-3"></span>
               Akurasi Prediksi
             </h3>
-            <p className="text-4xl sm:text-5xl font-bold text-blue-500">91%</p>
+            <p className="text-4xl sm:text-5xl font-bold text-blue-500">94%</p>
             <p className="text-gray-500 mt-1 sm:mt-2 text-xs sm:text-sm">Model machine learning</p>
           </div>
         </section>
@@ -217,7 +217,7 @@ export default function Dashboard() {
 
         {/* Peringatan Hujan */}
         <section className="bg-white p-3 sm:p-5 rounded-2xl shadow-lg">
-          <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-800">Peringatan Hujan</h3>
+          <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-800">Peringatan Hujan JABODETABEK</h3>
           {loading ? (
             <div className="space-y-2 sm:space-y-3">
               {[...Array(3)].map((_, i) => (
