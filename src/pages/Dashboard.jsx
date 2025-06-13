@@ -229,9 +229,16 @@ export default function Dashboard() {
             </div>
           ) : error ? (
             <p className="text-red-500 text-base sm:text-lg">{error}</p>
-          ) : (
+          ) : weatherData && Object.keys(weatherData).length > 0 ? (
             <div className="space-y-1 sm:space-y-2">
-              {weatherData && Object.keys(weatherData).length > 0 ? (
+              {Object.keys(weatherData).some((areaName) =>
+                Array.isArray(weatherData[areaName]?.data?.[0]?.cuaca?.[0]) &&
+                weatherData[areaName].data[0].cuaca[0].some(
+                  (cuaca) =>
+                    typeof cuaca.weather_desc === 'string' &&
+                    cuaca.weather_desc.includes('Hujan')
+                )
+              ) ? (
                 Object.keys(weatherData).map((areaName, index) =>
                   Array.isArray(weatherData[areaName]?.data?.[0]?.cuaca?.[0])
                     ? weatherData[areaName].data[0].cuaca[0]
@@ -296,8 +303,54 @@ export default function Dashboard() {
                     : null
                 )
               ) : (
-                <p className="p-3 sm:p-4 text-gray-500 text-sm">Tidak ada peringatan hujan saat ini.</p>
+                <div className="p-4 sm:p-6 bg-blue-50 rounded-lg flex items-center space-x-3 sm:space-x-4">
+                  <svg
+                    className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-sm sm:text-base text-gray-800 font-medium">
+                      Tidak ada peringatan hujan saat ini
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-600">
+                      Cuaca di JABODETABEK saat ini terdeteksi aman dari risiko hujan lebat. Tetap pantau untuk pembaruan.
+                    </p>
+                  </div>
+                </div>
               )}
+            </div>
+          ) : (
+            <div className="p-4 sm:p-6 bg-blue-50 rounded-lg flex items-center space-x-3 sm:space-x-4">
+              <svg
+                className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div>
+                <p className="text-sm sm:text-base text-gray-800 font-medium">
+                  Tidak ada peringatan hujan saat ini
+                </p>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Cuaca di JABODETABEK saat ini terdeteksi aman dari risiko hujan lebat. Tetap pantau untuk pembaruan.
+                </p>
+              </div>
             </div>
           )}
         </section>

@@ -54,9 +54,12 @@ export function AuthProvider({ children }) {
   };
 
   const register = (userData, token) => {
-    console.log('Register data:', userData);
-    login(userData, token);
-  };
+  console.log('Register data:', userData);
+  setUser(userData);
+  localStorage.setItem('profileData', JSON.stringify(userData));
+  localStorage.setItem('token', token);
+  navigate('/'); // Redirect ke dashboard setelah registrasi
+};
 
   const logout = () => {
     setUser(null);

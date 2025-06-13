@@ -1,6 +1,7 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { ClipLoader } from 'react-spinners';
 
 const bulanOptions = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -26,8 +27,27 @@ const predictionSchema = Yup.object().shape({
     .max(107.2, 'Longitude harus antara 106.3 dan 107.2 (wilayah Jabodetabek)'),
 });
 
+// Flood facts to display during loading
+const floodFacts = [
+  'Banjir dapat dicegah dengan menjaga saluran air tetap bersih dari sampah.',
+  'Daerah rendah seperti Jakarta lebih rentan terhadap banjir musiman.',
+  'Pohon membantu menyerap air hujan dan mengurangi risiko banjir.',
+  'Persiapan darurat seperti tas siaga banjir sangat penting.',
+];
+
+// Progress messages to simulate prediction steps
+const progressMessages = [
+  'Menganalisis data geografis...',
+  'Memproses curah hujan historis...',
+  'Menghitung risiko banjir...',
+  'Menyelesaikan prediksi...',
+];
+
 export default function PredictionForm({ onSubmit, initialPosition = [106.8272, -6.1751], setPosition }) {
   const [isCoordinatesSaved, setIsCoordinatesSaved] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [currentFact, setCurrentFact] = useState(floodFacts[0]);
 
   const initialValues = {
     tahun: new Date().getFullYear(),
@@ -35,6 +55,23 @@ export default function PredictionForm({ onSubmit, initialPosition = [106.8272, 
     latitude: parseFloat(initialPosition[1]).toFixed(6),
     longitude: parseFloat(initialPosition[0]).toFixed(6)
   };
+
+  // Rotate progress messages and facts during submission
+  useEffect(() => {
+    if (!isSubmitting) return;
+    let messageIndex = 0;
+    const messageInterval = setInterval(() => {
+      setLoadingMessage(progressMessages[messageIndex]);
+      messageIndex = (messageIndex + 1) % progressMessages.length;
+    }, 4000); // Change message every 4 seconds
+    const factInterval = setInterval(() => {
+      setCurrentFact(floodFacts[Math.floor(Math.random() * floodFacts.length)]);
+    }, 5000); // Change fact every 5 seconds
+    return () => {
+      clearInterval(messageInterval);
+      clearInterval(factInterval);
+    };
+  }, [isSubmitting]);
 
   const handleSaveCoordinates = (values, setFieldValue) => {
     const boundedLng = Math.max(106.3, Math.min(107.2, parseFloat(values.longitude)));
@@ -46,14 +83,20 @@ export default function PredictionForm({ onSubmit, initialPosition = [106.8272, 
     console.log('Coordinates saved:', [boundedLng, boundedLat]);
   };
 
-  const handleSubmit = (values, actions) => {
+  const handleSubmit = async (values, actions) => {
+    setIsSubmitting(true);
     const formData = {
       ...values,
       latitude: parseFloat(values.latitude),
       longitude: parseFloat(values.longitude)
     };
-    onSubmit(formData, actions);
-    setIsCoordinatesSaved(false); // Reset after submission
+    try {
+      await onSubmit(formData, actions);
+      setIsCoordinatesSaved(false); // Reset after submission
+    } finally {
+      setIsSubmitting(false);
+      setLoadingMessage('');
+    }
   };
 
   return (
@@ -63,9 +106,9 @@ export default function PredictionForm({ onSubmit, initialPosition = [106.8272, 
         initialValues={initialValues}
         validationSchema={predictionSchema}
         onSubmit={handleSubmit}
-        enableReinitialize // Ensure form updates when initialPosition changes
+        enableReinitialize
       >
-        {({ isSubmitting, setFieldValue, values, setFieldTouched }) => (
+        {({ isSubmitting: formikSubmitting, setFieldValue, values, setFieldTouched }) => (
           <Form className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div>
@@ -160,18 +203,31 @@ export default function PredictionForm({ onSubmit, initialPosition = [106.8272, 
 
             <button
               type="submit"
-              disabled={isSubmitting || !isCoordinatesSaved}
+              disabled={formikSubmitting || !isCoordinatesSaved}
               className={`w-full py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                isSubmitting || !isCoordinatesSaved
+                formikSubmitting || !isCoordinatesSaved
                   ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
                   : 'bg-blue-600 text-white hover:bg-blue-700'
               }`}
             >
-              {isSubmitting ? 'Memproses...' : 'Prediksi Risiko Banjir'}
+              {formikSubmitting ? 'Memproses...' : 'Prediksi Risiko Banjir'}
             </button>
           </Form>
         )}
       </Formik>
+
+      {/* Loading Overlay with Spinner and Facts */}
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center max-w-md text-center">
+            <ClipLoader color="#3B82F6" size={50} />
+            <p className="mt-4 text-lg font-semibold text-gray-700">
+              {loadingMessage || 'Memulai prediksi...'}
+            </p>
+            <p className="mt-2 text-sm text-gray-600 italic">"{currentFact}"</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

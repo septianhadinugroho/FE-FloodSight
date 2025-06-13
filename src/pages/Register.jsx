@@ -1,10 +1,11 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import toast from 'react-hot-toast'; // Import toast
+import toast from 'react-hot-toast';
+import { FiEye, FiEyeOff } from 'react-icons/fi'; // Import ikon mata
 
 const registerSchema = Yup.object().shape({
   name: Yup.string().required('Wajib diisi'),
@@ -24,8 +25,18 @@ export default function Register() {
     longitude: 0,
   });
   const [apiError, setApiError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // State untuk password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State untuk confirmPassword
   const { register } = useAuth();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     if (coordinates.latitude === 0 || coordinates.longitude === 0) {
@@ -47,10 +58,7 @@ export default function Register() {
       localStorage.setItem('profileData', JSON.stringify(user));
       register(user, token);
       setApiError(null);
-      // Show success toast and redirect
-      toast.success('Registrasi berhasil! Selamat datang!', {
-        onClose: () => navigate('/'), // Redirect to dashboard
-      });
+      toast.success('Registrasi berhasil! Selamat datang!');
     } catch (err) {
       setApiError(err.response?.data?.error || 'Registrasi gagal');
       toast.error(err.response?.data?.error || 'Registrasi gagal');
@@ -103,8 +111,8 @@ export default function Register() {
           password: '',
           confirmPassword: '',
           city: '',
-          latitude: 0, // Initialize to prevent uncontrolled input
-          longitude: 0, // Initialize to prevent uncontrolled input
+          latitude: 0,
+          longitude: 0,
         }}
         validationSchema={registerSchema}
         onSubmit={handleSubmit}
@@ -131,32 +139,46 @@ export default function Register() {
               <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
             </div>
 
-            <div>
+            <div className="relative">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
               <Field
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 className="mt-1 block w-full rounded-md border-gray-300 p-2 border"
               />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800 mt-6"
+              >
+                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
               <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
             </div>
 
-            <div>
+            <div className="relative">
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
               <Field
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 name="confirmPassword"
                 className="mt-1 block w-full rounded-md border-gray-300 p-2 border"
               />
+              <button
+                type="button"
+                onClick={toggleConfirmPasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800 mt-6"
+              >
+                {showConfirmPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
               <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm" />
             </div>
 
             <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">Kota/Kabupaten Anda</label>
               <Field
                 type="text"
                 name="city"
-                placeholder="Masukkan nama kota atau kabupaten"
+                placeholder="Kabupaten Bekasi"
                 className="mt-1 block w-full rounded-md border-gray-300 p-2 border"
               />
               <ErrorMessage name="city" component="div" className="text-red-500 text-sm" />

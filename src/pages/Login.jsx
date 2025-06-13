@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { useState } from 'react';
+import { FiEye, FiEyeOff } from 'react-icons/fi'; // Import ikon mata dari react-icons
 
 const loginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -13,7 +14,12 @@ const loginSchema = Yup.object().shape({
 export default function Login() {
   const { login } = useAuth();
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // State untuk toggle visibilitas
   const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -26,7 +32,7 @@ export default function Login() {
       const { user, token } = response.data;
       login(user, token);
       setError(null);
-      navigate('/profile');
+      navigate('/');
     } catch (err) {
       console.error('Login error:', err.response?.data || err.message);
       setError(err.response?.data?.error || 'Login failed. Please try again.');
@@ -56,13 +62,20 @@ export default function Login() {
               <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
             </div>
 
-            <div>
+            <div className="relative">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
               <Field
-                type="password"
+                type={showPassword ? 'text' : 'password'} // Toggle tipe input berdasarkan state
                 name="password"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
               />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800 mt-6"
+              >
+                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
               <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
             </div>
 
@@ -79,7 +92,7 @@ export default function Login() {
 
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600">
-          Don't have an account? <Link to="/register" className="text-blue-600 hover:text-blue-800">Register</Link>
+          Tidak memiliki akun? <Link to="/register" className="text-blue-600 hover:text-blue-800">Register</Link>
         </p>
       </div>
     </div>
